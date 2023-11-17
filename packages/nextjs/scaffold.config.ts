@@ -9,9 +9,23 @@ export type ScaffoldConfig = {
   walletAutoConnect: boolean;
 };
 
+/* 
+const externalContracts = {
+  1: {
+    DAI: {
+      address: "0x...",
+      abi: [...],
+    },
+    WETH: {
+      address: "0x...",
+      abi: [...],
+    },
+} as const;
+*/
+
 const scaffoldConfig = {
   // The network where your DApp lives in
-  targetNetwork: chains.hardhat,
+  targetNetwork: chains.sepolia,
 
   // The interval at which your front-end polls the RPC servers for new data
   // it has no effect on the local network

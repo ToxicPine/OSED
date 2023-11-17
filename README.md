@@ -1,78 +1,100 @@
-# 🏗 Scaffold-ETH 2
+# OSED
 
-<h4 align="center">
-  <a href="https://docs.scaffoldeth.io">Documentation</a> |
-  <a href="https://scaffoldeth.io">Website</a>
-</h4>
+**This was made for a hackathon, don't take any of this to be production-ready. Thanks, Sygma Protocol!**
 
-🧪 An open-source, up-to-date toolkit for building decentralized applications (dapps) on the Ethereum blockchain. It's designed to make it easier for developers to create and deploy smart contracts and build user interfaces that interact with those contracts.
+## What Is OSED?
 
-⚙️ Built using NextJS, RainbowKit, Hardhat, Wagmi, and Typescript.
+### In Short
 
-- ✅ **Contract Hot Reload**: Your frontend auto-adapts to your smart contract as you edit it.
-- 🔥 **Burner Wallet & Local Faucet**: Quickly test your application with a burner wallet and local faucet.
-- 🔐 **Integration with Wallet Providers**: Connect to different wallet providers and interact with the Ethereum network.
+OSED is an extension to Solidity that allows you to effortlessly write dApps such that logic is split between different blockchains: you can easily offload execution to where it is cheapest and store the result on Ethereum. You don't need to think about cross-chain message passing, you just write the logic as if it were happening on one chain and annotate the functions and shared functions.
 
-![Debug Contracts tab](https://github.com/scaffold-eth/scaffold-eth-2/assets/55535804/1171422a-0ce4-4203-bcd4-d2d1941d198b)
+### Why?
 
-## Requirements
+New L1's are thousands of times cheaper and more versatile than Ethereum, yet the Ethereum main-chain is much better supported. We need to write dApps that use faster and cheaper L1's to do what Ethereum can not whilst keeping all of our assets on the main-chain.
 
-Before you begin, you need to install the following tools:
+This requires **a language for mixed dApps**: a smart-contracting language whereby dApps which can flexibly allocate computational and storage tasks across different chains without thinking about the cross-chain interactions.
 
-- [Node (v18 LTS)](https://nodejs.org/en/download/)
-- Yarn ([v1](https://classic.yarnpkg.com/en/docs/install/) or [v2+](https://yarnpkg.com/getting-started/install))
-- [Git](https://git-scm.com/downloads)
+OSED handles the cross-chain interactions gracefully. This allows you to **o**ut **s**ource **e**xecution and **d**ata storage from Ethereum to another chain, absorbing all of it's advantages.
 
-## Quickstart
+OSED code compiles down to a pair of regular Solidity smart-contracts, one of which is accessible via main-chain and the other of which is published on the foreign chain. We use Sygma Protocol's generic message passing technology to send messages across EVM chains.
 
-To get started with Scaffold-ETH 2, follow the steps below:
+## The OSED Language
+
+**This is all in the `./OSED` subdirectory.**
+
+It's dead simple: when you declare a state variable that you might want to reference across chains, prepend `shared` and append `with Ethereum, Polygon`
+
+Then, for each function, declare what chain you want it to execute on adding the line `@Chain(NAME)` on the line before the function.
+
+Example Contract:
+
+```
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.19;
+
+contract Counter {
+shared uint public count with polygon;
+
+    // Function to get the current count.
+    @Chain(Ethereum)
+    function get() public view returns (uint) {
+        return count;
+    }
+
+    // Function to increment count by 1.
+    @Chain(Polygon)
+    function inc() public {
+        count += 1;
+    }
+
+    // Function to decrement count by 1.
+    @Chain(Polygon)
+    function dec() public {
+        // This function will fail if count = 0
+        count -= 1;
+    }
+
+}
+```
+
+The compiler knows when to send parts of the state cross-chain and spits out a pair of contracts, one for Ethereum and the other for Polygon, which will communicate when necessary. Then, you can just call the `inc()` function on Ethereum.
+
+### Using The Compiler
+
+It's a simple Python script in the OSED directory. You just run it on a `.osed` file and it generate two contracts in your working directory, each with a name ending in `.[chain name].sol`
+
+`python3 main.py demo.osed`
+
+## Web App
+
+The web app is a demo of that simple counter example that I described previously. It offloads the (not very expensive) computation of incrementing or decrementing the counter to Polygon's Mumbai testnet from the Ethereum Sepolia testnet.
 
 1. Clone this repo & install dependencies
 
 ```
-git clone https://github.com/scaffold-eth/scaffold-eth-2.git
-cd scaffold-eth-2
+
+git clone https://github.com/ToxicPine/OSED.git
+cd OSED
 yarn install
-```
-
-2. Run a local network in the first terminal:
 
 ```
-yarn chain
-```
 
-This command starts a local Ethereum network using Hardhat. The network runs on your local machine and can be used for testing and development. You can customize the network configuration in `hardhat.config.ts`.
-
-3. On a second terminal, deploy the test contract:
+2. Deploy the test contract:
 
 ```
+
 yarn deploy
-```
-
-This command deploys a test smart contract to the local network. The contract is located in `packages/hardhat/contracts` and can be modified to suit your needs. The `yarn deploy` command uses the deploy script located in `packages/hardhat/deploy` to deploy the contract to the network. You can also customize the deploy script.
-
-4. On a third terminal, start your NextJS app:
 
 ```
+
+You will need to set a valid private key in your env which has Sepolia Eth testnet tokens.
+
+4. On a second terminal, start the NextJS app:
+
+```
+
 yarn start
+
 ```
 
-Visit your app on: `http://localhost:3000`. You can interact with your smart contract using the `Debug Contracts` page. You can tweak the app config in `packages/nextjs/scaffold.config.ts`.
-
-Run smart contract test with `yarn hardhat:test`
-
-- Edit your smart contract `YourContract.sol` in `packages/hardhat/contracts`
-- Edit your frontend in `packages/nextjs/pages`
-- Edit your deployment scripts in `packages/hardhat/deploy`
-
-## Documentation
-
-Visit our [docs](https://docs.scaffoldeth.io) to learn how to start building with Scaffold-ETH 2.
-
-To know more about its features, check out our [website](https://scaffoldeth.io).
-
-## Contributing to Scaffold-ETH 2
-
-We welcome contributions to Scaffold-ETH 2!
-
-Please see [CONTRIBUTING.MD](https://github.com/scaffold-eth/scaffold-eth-2/blob/main/CONTRIBUTING.md) for more information and guidelines for contributing to Scaffold-ETH 2.
+Visit the app on: `http://localhost:3000`.

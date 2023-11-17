@@ -6,7 +6,7 @@
 
 ### In Short
 
-OSED is an extension to Solidity that allows you to effortlessly write dApps such that logic is split between different blockchains: you can easily offload execution to where it is cheapest and store the result on Ethereum. You don't need to think about cross-chain message passing, you just write the logic as if it were happening on one chain and annotate the functions and shared functions.
+OSED is an extension to Solidity that allows you to effortlessly write dApps such that logic is split between different blockchains: you can easily offload execution to where it is cheapest and store the result on Ethereum. You don't need to think about cross-chain message passing, you just write the logic as if it were happening on one chain and annotate the functions and shared state variables.
 
 ### Why?
 

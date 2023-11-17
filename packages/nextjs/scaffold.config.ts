@@ -9,20 +9,6 @@ export type ScaffoldConfig = {
   walletAutoConnect: boolean;
 };
 
-/* 
-const externalContracts = {
-  1: {
-    DAI: {
-      address: "0x...",
-      abi: [...],
-    },
-    WETH: {
-      address: "0x...",
-      abi: [...],
-    },
-} as const;
-*/
-
 const scaffoldConfig = {
   // The network where your DApp lives in
   targetNetwork: chains.sepolia,

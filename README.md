@@ -33,7 +33,7 @@ Example Contract:
 pragma solidity ^0.8.19;
 
 contract Counter {
-shared uint public count with polygon;
+    shared uint public count with Polygon;
 
     // Function to get the current count.
     @Chain(Ethereum)
